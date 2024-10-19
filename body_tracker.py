@@ -9,10 +9,12 @@ mp_drawing = mp.solutions.drawing_utils
 
 cap = cv2.VideoCapture(0)
 
-read_frequency_ms = 500
+read_frequency_ms = 100
 
 conn = sqlite3.connect('pose_data.db')
 cursor = conn.cursor()
+
+cursor.execute("DROP TABLE IF EXISTS keypoint_data")
 
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS keypoint_data (
@@ -52,8 +54,7 @@ while cap.isOpened():
             print(f'Кадр {frame_id}, Ключевой пункт {idx}: (x: {cx}, y: {cy})')
 
             cursor.execute('''
-            INSERT INTO keypoint_data (frame_id, keypoint_index, x_coord, y_coord, timestamp)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO keypoint_data (frame_id, keypoint_index, x_coord, y_coord, timestamp) VALUES (?, ?, ?, ?, ?)
             ''', (frame_id, idx, cx, cy, timestamp))
 
             cv2.circle(frame, (cx, cy), 5, (0, 255, 0), -1)
@@ -66,7 +67,7 @@ while cap.isOpened():
 
     elapsed_time = (time.time() - start_time) * 1000  # Перевод в миллисекунды
 
-    wait_time = int(max(1, read_frequency_ms - elapsed_time))  # Обеспечение положительного времени ожидания
+    wait_time = int(max(1, int(read_frequency_ms - elapsed_time)))  # Обеспечение положительного времени ожидания
     if cv2.waitKey(wait_time) & 0xFF == ord('q'):
         break
 

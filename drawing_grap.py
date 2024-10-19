@@ -2,13 +2,14 @@
 import matplotlib.pyplot as plt
 from datetime import datetime
 
+
 def parse_timestamp(timestamp_str):
     return datetime.strptime(timestamp_str, '%Y-%m-%d %H:%M:%S')
+
 
 conn = sqlite3.connect('pose_data.db')
 cursor = conn.cursor()
 
-# Извлечение данных для скорости движения (по ключевой точке 11, например, левое бедро)
 cursor.execute('''
 SELECT frame_id, speed, timestamp 
 FROM analysis_data
@@ -17,7 +18,6 @@ ORDER BY frame_id
 ''')
 speed_data = cursor.fetchall()
 
-# Извлечение данных для углов поворота (между двумя плечами, индекс 11)
 cursor.execute('''
 SELECT frame_id, rotation, timestamp 
 FROM analysis_data
@@ -26,10 +26,7 @@ ORDER BY frame_id
 ''')
 rotation_data = cursor.fetchall()
 
-# Закрытие соединения с базой данных
 conn.close()
-
-# Переход к построению графиков
 
 # График скорости движения ключевой точки 11 (например, левое бедро)
 frame_ids_speed = [row[0] for row in speed_data]  # frame_id для скорости
